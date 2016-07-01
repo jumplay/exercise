@@ -1,0 +1,12 @@
+The search tree data structure supports many dynamic-set operations, including SEARCH, MINIMUM, MAXIMUM, PREDECESSOR, SUCCESSOR, INSERT, and DELETE.
+Basic operations on a binary search tree take time proportional to the height of the tree.
+Different binary search trees can represent the same set of values.
+The binary-search-tree property:
+	x...left.key <= x.key <= x...right.key
+Inorder tree walk:
+	print the root of a subtree between printing the values in its left subtree and printing those in its right subtree.
+Preorder tree walk:
+	print the root before the values in either subtree.
+Postorder tree walk:
+	print the root after the values in its subtrees.
+
