@@ -1,0 +1,12 @@
+A red-black tree is a binary search tree with one extra bit of storage per node: its color, which can be either red or black. By constraining the node colors on any simple path from the root to a leaf, red-black trees ensure that no such path is more than twice as long as any other, so that the tree is approximately balanced.
+A red-black tree is a binary tree that satisfies the following red-black properties:
+	1. Every node is either red or black.
+	2. The root is black.
+	3. Every leaf is black.
+	4. If a node is red, then both its children are black.
+	5. For each node, all simple paths from the node to descendant leaves contain the same number of black nodes.
+
+<notion>:
+Internal node: A nonleaf node is an internal node.
+Black height: We call the number of black nodes on any simple path from, but not including, a node x down to a leaf the black-height of the node. Leaf nodes have black height 0. The tree is complete binary tree in black height.
+
