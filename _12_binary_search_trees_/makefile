@@ -5,4 +5,4 @@ a.o: a.c binary_search_tree.h
 binary_search_tree.o: binary_search_tree.c binary_search_tree.h
 	gcc -c binary_search_tree.c
 clean:
-	rm binary_search_tree.o a.o a.out
+	rm -f *.o *.out *.exe
