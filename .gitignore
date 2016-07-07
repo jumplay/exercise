@@ -33,3 +33,5 @@
 
 #others
 *.swp
+.gitignore
+
