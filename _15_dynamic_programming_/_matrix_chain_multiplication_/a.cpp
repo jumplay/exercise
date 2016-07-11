@@ -16,27 +16,49 @@ void alloc_buf(T*&p, uint32_t n, const char* str) {
 }
 
 uint32_t sub_run(uint32_t l, uint32_t r, const uint32_t* p, uint32_t* p_m, const uint32_t nr) {
-	static uint32_t xxx = 1;
-	printf(">%u\n", xxx++);
-	if (l == r) { return 1; }
-	puts("zzz");
-	if (p_m[l * nr + r]) { return p_m[l * nr + r]; }
-	puts("yyy");
+	//printf("<%u, %u>\n", l, r);
+	if (l == r) {
+        printf("<%u, %u>\n", l, r);
+        printf("\t>1\n");
+        return 1;
+    }
+	if (p_m[l * nr + r]) {
+        uint32_t x = p_m[l * nr + r];
+        printf("<%u, %u>\n", l, r);
+        printf("\t>%u\n", x);
+        return x;
+    }
 	if (l + 1 == r) {
-		return p_m[l * nr + r] = p[l] * p[l + 1] * p[l + 2];
+		uint32_t x = p_m[l * nr + r] = p[l] * p[l + 1] * p[l + 2];
+        printf("<%u, %u>\n", l, r);
+        printf("\t>%u\n", x);
+        return x;
 	}
 
-	uint32_t x;
+	uint32_t k;
 	uint32_t min = (uint32_t)(-1);
 	for (uint32_t i = l; i < r; i++) {
-		puts("xxx");
-		uint32_t tmp = p[l] * sub_run(l, i, p, p_m, nr) * p[i + 1] * sub_run(i + 1, r, p, p_m, nr) * p[r + 1];
+        uint32_t xl = sub_run(l, i, p, p_m, nr);
+        uint32_t xr = sub_run(i + 1, r, p, p_m, nr);
+		uint32_t tmp = p[l] * xl * p[i + 1] * xr * p[r + 1];
+        if (tmp == 0) {
+            printf("<l/i/r> [%u/%u/%u]\n", l, i, r);
+            printf("<xl/xr> [%u/%u]\n", xl, xr);
+            uint64_t x64 = 1;
+            x64 = x64*p[l]*xl*p[i+1]*xr*p[r+1];
+            uint32_t x32l = (uint32_t)x64;
+            uint32_t x32u = x64>>32;
+            printf("<x32l/x32u> [%u/%u]\n", x32l, x32u);
+        }
 		if (tmp < min) {
 			min = tmp;
-			x = i;
+			k = i;
 		}
 	}
-	return p_m[l * nr + r] = min;
+	uint32_t x = p_m[l * nr + r] = min;
+    printf("<%u, %u>\n", l, r);
+    printf("\t>%u\n", x);
+    return x;
 }
 
 void create_a(const uint32_t* p, const uint32_t ns) {
@@ -44,7 +66,8 @@ void create_a(const uint32_t* p, const uint32_t ns) {
 	uint32_t nr = ns - 1;
 	alloc_buf(p_m, nr * nr, "p_m");
 	memset(p_m, 0, nr * nr * sizeof(uint32_t));
-	uint32_t min = sub_run(0, nr - 1, p, p_m, nr);
+	//uint32_t min = sub_run(0, nr - 1, p, p_m, nr);
+	uint32_t min = sub_run(2, 8, p, p_m, nr);
 	printf("min: %u\n", min);
 }
 
@@ -86,6 +109,7 @@ int main() {
 		p_f = NULL;
 	}
 	
+    printf("ns: %u\n", ns);
 	create_a(p, ns);
 
 
