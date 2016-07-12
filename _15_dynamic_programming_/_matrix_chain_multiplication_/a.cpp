@@ -4,74 +4,11 @@
 #include <time.h>
 #include <new>
 #include <string.h>
+#include "matrix_chain.h"
 
-template <class T>
-void alloc_buf(T*&p, uint32_t n, const char* str) {
-	try {
-		p = new T[n];
-	} catch(std::bad_alloc &bd) {
-		printf("bad_alloc, <%s>\n", str);
-		exit(1);
-	}
-}
-
-uint32_t sub_run(uint32_t l, uint32_t r, const uint32_t* p, uint32_t* p_m, const uint32_t nr) {
-	//printf("<%u, %u>\n", l, r);
-	if (l == r) {
-        printf("<%u, %u>\n", l, r);
-        printf("\t>1\n");
-        return 1;
-    }
-	if (p_m[l * nr + r]) {
-        uint32_t x = p_m[l * nr + r];
-        printf("<%u, %u>\n", l, r);
-        printf("\t>%u\n", x);
-        return x;
-    }
-	if (l + 1 == r) {
-		uint32_t x = p_m[l * nr + r] = p[l] * p[l + 1] * p[l + 2];
-        printf("<%u, %u>\n", l, r);
-        printf("\t>%u\n", x);
-        return x;
-	}
-
-	uint32_t k;
-	uint32_t min = (uint32_t)(-1);
-	for (uint32_t i = l; i < r; i++) {
-        uint32_t xl = sub_run(l, i, p, p_m, nr);
-        uint32_t xr = sub_run(i + 1, r, p, p_m, nr);
-		uint32_t tmp = p[l] * xl * p[i + 1] * xr * p[r + 1];
-        if (tmp == 0) {
-            printf("<l/i/r> [%u/%u/%u]\n", l, i, r);
-            printf("<xl/xr> [%u/%u]\n", xl, xr);
-            uint64_t x64 = 1;
-            x64 = x64*p[l]*xl*p[i+1]*xr*p[r+1];
-            uint32_t x32l = (uint32_t)x64;
-            uint32_t x32u = x64>>32;
-            printf("<x32l/x32u> [%u/%u]\n", x32l, x32u);
-        }
-		if (tmp < min) {
-			min = tmp;
-			k = i;
-		}
-	}
-	uint32_t x = p_m[l * nr + r] = min;
-    printf("<%u, %u>\n", l, r);
-    printf("\t>%u\n", x);
-    return x;
-}
-
-void create_a(const uint32_t* p, const uint32_t ns) {
-	uint32_t* p_m = NULL;
-	uint32_t nr = ns - 1;
-	alloc_buf(p_m, nr * nr, "p_m");
-	memset(p_m, 0, nr * nr * sizeof(uint32_t));
-	//uint32_t min = sub_run(0, nr - 1, p, p_m, nr);
-	uint32_t min = sub_run(2, 8, p, p_m, nr);
-	printf("min: %u\n", min);
-}
 
 int main() {
+
 	uint32_t ns = 0;
 	uint32_t *p = NULL;
 	
@@ -86,7 +23,7 @@ int main() {
 		ns = atoi(buf);
 		fprintf(p_f, "%u\n", ns);
 		srand((uint32_t)time(NULL));
-		alloc_buf(p, ns, "p");
+		m_alloc(p, ns, "p");
 		for (uint32_t i = 0; i < ns; i++) {
 			uint32_t x = rand() % 100;
 			while (x < 10) {
@@ -99,9 +36,14 @@ int main() {
 	} else {
 		fgets(buf, 10, p_f);
 		ns = atoi(buf);
-		alloc_buf(p, ns, "p");
-		for (uint32_t i = 0; fgets(buf, 10, p_f); i++) {
+		m_alloc(p, ns, "p");
+		uint32_t i = 0;
+		for (; fgets(buf, 10, p_f) && i < ns; i++) {
 			p[i] = atoi(buf);
+		}
+		if (i != ns) {
+			printf("error: i != ns\n");
+			return 0;
 		}
 	}
 	if(p_f) {
@@ -110,8 +52,17 @@ int main() {
 	}
 	
     printf("ns: %u\n", ns);
-	create_a(p, ns);
+	uint32_t* p1 = create_top_down(p, ns);
+	uint32_t* p2 = create_bottom_up(p, ns);
 
+	for (uint32_t i = 0; i < (ns - 1) * (ns - 1); i ++) {
+		if (p1[i] != p2[i]) {
+			printf("<%u, %u>\n", i / (ns - 1), i % (ns - 1));
+			printf("\t[%u, %u]\n", p1[i], p2[i]);
+		}
+	}
+
+	print_chain(p1, ns - 1);
 
 	return 0;
 }
